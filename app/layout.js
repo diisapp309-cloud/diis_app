@@ -11,7 +11,7 @@ export const metadata = {
   title: APP_NAME,
   description: 'Record truck movements with FBR digital invoice, sender and receiver NTN, goods value and sales tax.',
   applicationName: APP_NAME,
-  appleWebApp: { capable: true, title: 'DIIS Log', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'DIIS', statusBarStyle: 'default' },
   formatDetection: { telephone: false },
 };
 

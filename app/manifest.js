@@ -1,7 +1,7 @@
 export default function manifest() {
   return {
-    name: 'DIIS Dispatch Log',
-    short_name: 'DIIS Log',
+    name: 'Digital Invoice Integrity System',
+    short_name: 'DIIS',
     description: 'Record truck movements with FBR invoice, NTNs, goods value and sales tax.',
     start_url: '/',
     scope: '/',

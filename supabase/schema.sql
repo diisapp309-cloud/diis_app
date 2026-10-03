@@ -1,4 +1,4 @@
--- DIIS dispatch log schema.
+-- Digital Invoice Integrity System (DIIS) schema.
 -- Run once in Supabase Dashboard -> SQL Editor (safe to re-run).
 --
 -- Rules enforced here (not just in the UI):

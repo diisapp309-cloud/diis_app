@@ -1,4 +1,4 @@
-# DIIS Dispatch Log
+# Digital Invoice Integrity System (DIIS)
 
 Website + installable app (PWA) for recording truck consignments:
 truck/vehicle number, date & time, sender + NTN, FBR digital invoice number, value of goods,
