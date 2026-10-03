@@ -7,6 +7,9 @@ sales tax, receiver + NTN.
 - **Users** sign in with a username/password created by the admin, submit records, and see their own
   records as a log by **day / week / month / custom range**, with search and filters and CSV export.
   They can edit a record **only on the day they submitted it** (Pakistan time). Older records are locked.
+- **My account** (every user): change their own password (current password required) and keep optional
+  details up to date — full name, phone, CNIC, contact email, company, address. Username, role and
+  active status can only be changed by the admin.
 - **Admin** (`diisapp309@gmail.com`) sees every user's records, adds records (for themself or on behalf
   of a user), edits or deletes any record, views each record's change history, and manages accounts:
   create user, reset password, disable/enable, make admin.

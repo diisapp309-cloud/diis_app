@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { adminApi } from '@/lib/supabase';
 import { formatDateTime, generatePassword } from '@/lib/format';
 import { USERNAME_PATTERN } from '@/lib/config';
+import { cleanDetails } from '@/lib/profile';
+import ProfileDetailsForm from './ProfileDetailsForm';
 import { useAuth } from './AuthProvider';
 import Icon from './Icon';
 import Modal from './Modal';
@@ -37,7 +39,7 @@ function Credentials({ username, password, onDone }) {
 }
 
 function CreateUserForm({ onCreated, onCancel }) {
-  const [v, setV] = useState({ username: '', full_name: '', password: generatePassword(), role: 'user' });
+  const [v, setV] = useState({ username: '', full_name: '', phone: '', cnic: '', password: generatePassword(), role: 'user' });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [created, setCreated] = useState(null);
@@ -50,9 +52,11 @@ function CreateUserForm({ onCreated, onCancel }) {
     const username = v.username.trim().toLowerCase();
     if (!USERNAME_PATTERN.test(username)) return setError('Username must be 3–32 characters: lowercase letters, numbers, dot, dash or underscore.');
     if (v.password.length < 8) return setError('Password must be at least 8 characters.');
+    const { values: details, errors } = cleanDetails({ full_name: v.full_name, phone: v.phone, cnic: v.cnic });
+    if (Object.keys(errors).length) return setError(Object.values(errors)[0]);
     setSaving(true);
     try {
-      await adminApi('/api/admin/users', { method: 'POST', body: { ...v, username } });
+      await adminApi('/api/admin/users', { method: 'POST', body: { ...v, ...details, username } });
       setCreated({ username, password: v.password });
       onCreated();
     } catch (err) {
@@ -74,6 +78,16 @@ function CreateUserForm({ onCreated, onCancel }) {
       <div className="field">
         <label htmlFor="u-name">Full name <span className="muted">(optional)</span></label>
         <input id="u-name" value={v.full_name} onChange={set('full_name')} maxLength={120} />
+      </div>
+      <div className="grid-2">
+        <div className="field">
+          <label htmlFor="u-phone">Phone <span className="muted">(optional)</span></label>
+          <input id="u-phone" value={v.phone} onChange={set('phone')} inputMode="tel" maxLength={20} placeholder="+92 300 1234567" />
+        </div>
+        <div className="field">
+          <label htmlFor="u-cnic">CNIC <span className="muted">(optional)</span></label>
+          <input id="u-cnic" className="mono" value={v.cnic} onChange={set('cnic')} inputMode="numeric" maxLength={15} placeholder="12345-1234567-1" />
+        </div>
       </div>
       <div className="field">
         <label htmlFor="u-password">Password</label>
@@ -214,6 +228,9 @@ export default function UsersPanel() {
                     <td>
                       <span className="mono">{u.username}</span>
                       {u.full_name && <span className="sub">{u.full_name}</span>}
+                      {(u.phone || u.cnic) && (
+                        <span className="contact mono">{[u.phone, u.cnic && `CNIC ${u.cnic}`].filter(Boolean).join(' · ')}</span>
+                      )}
                       {self && <span className="sub">You · {u.email}</span>}
                     </td>
                     <td>
@@ -232,6 +249,9 @@ export default function UsersPanel() {
                     <td><span className={`badge ${u.is_active ? 'badge-ok' : 'badge-off'}`}>{u.is_active ? 'Active' : 'Disabled'}</span></td>
                     <td className="mono small">{u.last_sign_in_at ? formatDateTime(u.last_sign_in_at) : 'Never'}</td>
                     <td className="row-actions">
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDialog({ type: 'details', user: u })} disabled={busy === u.id}>
+                        <Icon name="edit" size={16} /> Edit details
+                      </button>
                       <button type="button" className="btn btn-ghost btn-sm" onClick={() => setDialog({ type: 'reset', user: u })} disabled={busy === u.id}>
                         <Icon name="key" size={16} /> Reset password
                       </button>
@@ -258,6 +278,18 @@ export default function UsersPanel() {
       {dialog?.type === 'create' && (
         <Modal title="New user" onClose={closeDialog}>
           <CreateUserForm onCreated={load} onCancel={closeDialog} />
+        </Modal>
+      )}
+      {dialog?.type === 'details' && (
+        <Modal title={`Details · ${dialog.user.username}`} onClose={closeDialog} size="lg">
+          <ProfileDetailsForm
+            initial={dialog.user}
+            onCancel={closeDialog}
+            onSave={async (values) => {
+              await adminApi(`/api/admin/users/${dialog.user.id}`, { method: 'PATCH', body: values });
+              await load();
+            }}
+          />
         </Modal>
       )}
       {dialog?.type === 'reset' && (

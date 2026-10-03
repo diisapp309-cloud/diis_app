@@ -392,3 +392,24 @@ legend {
   .modal { max-height: 92dvh; border-radius: 14px 14px 0 0; }
   .table th:nth-child(4), .table td:nth-child(4) { display: none; }
 }
+
+/* ---------- account ---------- */
+.account { max-width: 760px; }
+.panel {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 24px; margin-bottom: 20px;
+}
+.panel-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+.panel .form-actions { margin-top: 20px; }
+.panel .field-hint { margin-top: 12px; }
+.span-2 { grid-column: 1 / -1; }
+textarea { min-height: 64px; resize: vertical; }
+.alert-ok { background: var(--ok-soft); border-color: transparent; color: var(--ok); }
+.checkbox { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.checkbox input { width: 18px; height: 18px; min-height: 0; padding: 0; accent-color: var(--accent); }
+.table .contact { display: block; font-size: 13px; color: var(--ink-2); }
+
+@media (max-width: 720px) {
+  .nav-label { display: none; }
+  .panel { padding: 16px; }
+}

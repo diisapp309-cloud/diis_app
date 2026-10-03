@@ -6,6 +6,8 @@ import { isConfigured } from '@/lib/config';
 
 const AuthContext = createContext(null);
 
+const PROFILE_COLUMNS = 'id, username, full_name, role, is_active, phone, cnic, contact_email, company, address, updated_at';
+
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -26,7 +28,7 @@ export function AuthProvider({ children }) {
       }
       const { data, error } = await sb
         .from('profiles')
-        .select('id, username, full_name, role, is_active')
+        .select(PROFILE_COLUMNS)
         .eq('id', next.user.id)
         .maybeSingle();
       if (!active) return;
@@ -65,8 +67,11 @@ export function AuthProvider({ children }) {
     await getSupabase().auth.signOut();
   }, []);
 
+  // Lets the account page show saved details without a reload.
+  const updateProfile = useCallback((patch) => setProfile((p) => (p ? { ...p, ...patch } : p)), []);
+
   return (
-    <AuthContext.Provider value={{ session, profile, loading, notice, setNotice, signOut, isAdmin: profile?.role === 'admin' }}>
+    <AuthContext.Provider value={{ session, profile, loading, notice, setNotice, signOut, updateProfile, isAdmin: profile?.role === 'admin' }}>
       {children}
     </AuthContext.Provider>
   );

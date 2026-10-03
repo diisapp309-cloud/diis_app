@@ -1,5 +1,6 @@
 import { HttpError, handle, readJson, requireAdmin } from '@/lib/server/admin';
 import { USERNAME_DOMAIN, USERNAME_PATTERN } from '@/lib/config';
+import { cleanDetails } from '@/lib/profile';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,7 @@ export const GET = handle(async (request) => {
 
   const { data: profiles, error } = await sb
     .from('profiles')
-    .select('id, username, full_name, role, is_active, created_at')
+    .select('id, username, full_name, role, is_active, created_at, phone, cnic, contact_email, company, address')
     .order('created_at', { ascending: true });
   if (error) throw new HttpError(500, error.message);
 
@@ -31,9 +32,11 @@ export const POST = handle(async (request) => {
   const body = await readJson(request);
 
   const username = String(body.username || '').trim().toLowerCase();
-  const fullName = String(body.full_name || '').trim().slice(0, 120) || null;
   const password = String(body.password || '');
   const role = body.role === 'admin' ? 'admin' : 'user';
+  const { values: details, errors } = cleanDetails(body);
+  if (Object.keys(errors).length) throw new HttpError(400, Object.values(errors)[0]);
+  const fullName = details.full_name ?? null;
 
   if (!USERNAME_PATTERN.test(username)) {
     throw new HttpError(400, 'Username must be 3–32 characters: lowercase letters, numbers, dot, dash or underscore.');
@@ -54,7 +57,7 @@ export const POST = handle(async (request) => {
   // The on_auth_user_created trigger made the profile; set the fields the trigger can't know.
   const { error: profileError } = await sb
     .from('profiles')
-    .update({ role, full_name: fullName, username })
+    .update({ ...details, role, username })
     .eq('id', data.user.id);
   if (profileError) throw new HttpError(500, profileError.message);
 

@@ -10,7 +10,10 @@ export default function AppShell({ children }) {
   const { profile, isAdmin, signOut } = useAuth();
   const pathname = usePathname();
 
-  const links = [{ href: '/records', label: isAdmin ? 'My entries' : 'My records', icon: 'list' }];
+  const links = [
+    { href: '/records', label: isAdmin ? 'My entries' : 'My records', icon: 'list' },
+    { href: '/account', label: 'My account', icon: 'user' },
+  ];
   if (isAdmin) links.unshift({ href: '/admin', label: 'Admin', icon: 'shield' });
 
   return (
@@ -22,8 +25,8 @@ export default function AppShell({ children }) {
         </Link>
         <nav className="topnav" aria-label="Main">
           {links.map((l) => (
-            <Link key={l.href} href={l.href} className="topnav-link" aria-current={pathname === l.href ? 'page' : undefined}>
-              <Icon name={l.icon} size={16} /> <span>{l.label}</span>
+            <Link key={l.href} href={l.href} className="topnav-link" title={l.label} aria-current={pathname === l.href ? 'page' : undefined}>
+              <Icon name={l.icon} size={16} /> <span className="nav-label">{l.label}</span>
             </Link>
           ))}
         </nav>

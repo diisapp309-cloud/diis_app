@@ -17,6 +17,46 @@ create table if not exists public.profiles (
   created_at  timestamptz not null default now()
 );
 
+-- Optional personal details (users can edit their own; see profiles_update_own below).
+alter table public.profiles add column if not exists phone         text;
+alter table public.profiles add column if not exists cnic          text;
+alter table public.profiles add column if not exists contact_email text;
+alter table public.profiles add column if not exists company       text;
+alter table public.profiles add column if not exists address       text;
+alter table public.profiles add column if not exists updated_at    timestamptz;
+
+alter table public.profiles drop constraint if exists profiles_full_name_check;
+alter table public.profiles add constraint profiles_full_name_check
+  check (full_name is null or char_length(full_name) <= 120);
+alter table public.profiles drop constraint if exists profiles_phone_check;
+alter table public.profiles add constraint profiles_phone_check
+  check (phone is null or phone ~ '^\+?[0-9][0-9 -]{6,19}$');
+alter table public.profiles drop constraint if exists profiles_cnic_check;
+alter table public.profiles add constraint profiles_cnic_check
+  check (cnic is null or cnic ~ '^[0-9]{5}-[0-9]{7}-[0-9]$');
+alter table public.profiles drop constraint if exists profiles_contact_email_check;
+alter table public.profiles add constraint profiles_contact_email_check
+  check (contact_email is null or (char_length(contact_email) <= 254 and contact_email ~ '^[^@\s]+@[^@\s]+\.[^@\s]+$'));
+alter table public.profiles drop constraint if exists profiles_company_check;
+alter table public.profiles add constraint profiles_company_check
+  check (company is null or char_length(company) <= 200);
+alter table public.profiles drop constraint if exists profiles_address_check;
+alter table public.profiles add constraint profiles_address_check
+  check (address is null or char_length(address) <= 300);
+
+create or replace function public.profiles_touch()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_touch on public.profiles;
+create trigger profiles_touch
+  before update on public.profiles
+  for each row execute function public.profiles_touch();
+
 create or replace function public.is_admin()
 returns boolean language sql stable security definer set search_path = public as $$
   select exists (
@@ -161,11 +201,22 @@ alter table public.record_history enable row level security;
 
 revoke all on public.profiles, public.records, public.record_history from anon;
 
--- profiles: read own row; admin reads all. Writes go through the server (secret key) only.
+-- profiles: read own row; admin reads all.
 drop policy if exists profiles_select on public.profiles;
 create policy profiles_select on public.profiles
   for select to authenticated
   using (id = auth.uid() or public.is_admin());
+
+-- Users may edit only the optional detail columns of their own row. Username, role and
+-- active status have no column grant, so only the server (secret key) can change them.
+revoke insert, update, delete on public.profiles from authenticated;
+grant update (full_name, phone, cnic, contact_email, company, address) on public.profiles to authenticated;
+
+drop policy if exists profiles_update_own on public.profiles;
+create policy profiles_update_own on public.profiles
+  for update to authenticated
+  using (id = auth.uid() and public.is_active_user())
+  with check (id = auth.uid());
 
 -- records
 drop policy if exists records_select on public.records;

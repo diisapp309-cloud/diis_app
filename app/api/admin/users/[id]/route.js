@@ -1,10 +1,11 @@
 import { HttpError, handle, readJson, requireAdmin } from '@/lib/server/admin';
+import { cleanDetails } from '@/lib/profile';
 
 export const dynamic = 'force-dynamic';
 
 const FOREVER = '876000h'; // ~100 years; Supabase's way to block sign-in
 
-// Reset password, enable/disable, change role or name.
+// Reset password, enable/disable, change role, or edit optional details.
 export const PATCH = handle(async (request, { params }) => {
   const { sb, adminId } = await requireAdmin(request);
   const { id } = await params;
@@ -37,9 +38,9 @@ export const PATCH = handle(async (request, { params }) => {
     if (!['admin', 'user'].includes(body.role)) throw new HttpError(400, 'Role must be admin or user.');
     profileUpdate.role = body.role;
   }
-  if (body.full_name !== undefined) {
-    profileUpdate.full_name = String(body.full_name).trim().slice(0, 120) || null;
-  }
+  const { values: details, errors } = cleanDetails(body);
+  if (Object.keys(errors).length) throw new HttpError(400, Object.values(errors)[0]);
+  Object.assign(profileUpdate, details);
 
   if (Object.keys(profileUpdate).length) {
     const { error } = await sb.from('profiles').update(profileUpdate).eq('id', id);
