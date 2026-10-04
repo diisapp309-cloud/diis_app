@@ -7,10 +7,10 @@
   --ink-3: #7b8087;
   --line: #dfdbd2;
   --line-strong: #c9c4b8;
-  --accent: #0e5a4a;
-  --accent-hover: #0a4a3c;
+  --accent: #01411C;
+  --accent-hover: #0b5a2e;
   --accent-ink: #ffffff;
-  --accent-soft: #e1eee8;
+  --accent-soft: #e0ede4;
   --danger: #b3261e;
   --danger-soft: #fbe9e7;
   --ok: #1d6b3a;
@@ -412,4 +412,51 @@ textarea { min-height: 64px; resize: vertical; }
 @media (max-width: 720px) {
   .nav-label { display: none; }
   .panel { padding: 16px; }
+}
+
+/* ---------- Pakistan ---------- */
+:root { --flag-green: #01411C; --heart: #d7263d; }
+
+/* Faded flag behind every signed-in page; surfaces stay solid so data stays readable. */
+.flag-backdrop { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.13; }
+.flag-backdrop-art { display: block; width: 100%; height: 100%; }
+@media (prefers-color-scheme: dark) { .flag-backdrop { opacity: 0.22; } }
+
+.flag-mini {
+  flex: none; width: 24px; height: 16px; border-radius: 2px;
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.14);
+}
+.brand-flag { margin-left: 2px; }
+.page { padding-bottom: 40px; }
+.shell-footer { display: flex; justify-content: center; padding: 0 16px 32px; }
+.made-in-line { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); margin: 0; }
+.shell-footer .made-in-line {
+  padding: 6px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+}
+.heart { flex: none; color: var(--heart); }
+
+/* Sign-in panel styled as the flag: white hoist band, green field, crescent and star. */
+.login-side { position: relative; overflow: hidden; isolation: isolate; background: var(--flag-green); color: #fff; padding-left: 104px; }
+.login-side::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 64px; background: #fff; z-index: -1; }
+.login-watermark {
+  position: absolute; right: -10%; bottom: -12%; z-index: -1;
+  width: 72%; max-width: 560px; color: #fff; opacity: 0.08; pointer-events: none;
+}
+.login-brand-mark { background: #fff; color: var(--flag-green); }
+.login-flag {
+  display: block; width: 84px; height: 56px; margin-bottom: 24px; border-radius: 3px;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35), 0 8px 24px rgb(0 0 0 / 0.3);
+}
+.login-fields { margin-top: 28px; }
+.made-in-hero .made-in-line { color: #fff; font-size: 15px; font-weight: 500; }
+.made-in-hero .flag-mini { box-shadow: 0 0 0 1px rgb(255 255 255 / 0.45); }
+.made-in-hero .heart { color: #ff7a8a; }
+.made-in-hero .made-in-urdu { margin-top: 6px; font-size: 16px; line-height: 1.9; opacity: 0.85; text-align: left; }
+
+@media (max-width: 720px) {
+  .login-side { padding-left: 44px; }
+  .login-side::before { width: 20px; }
+  .login-flag { width: 60px; height: 40px; margin-bottom: 16px; }
+  .made-in-hero .made-in-line { font-size: 14px; }
+  .shell-footer .made-in-line { font-size: 12px; }
 }

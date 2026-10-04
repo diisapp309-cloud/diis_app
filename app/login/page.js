@@ -8,6 +8,8 @@ import { useAuth } from '@/components/AuthProvider';
 import ConfigMissing from '@/components/ConfigMissing';
 import InstallButton from '@/components/InstallButton';
 import Icon from '@/components/Icon';
+import PakistanFlag, { CrescentStar } from '@/components/PakistanFlag';
+import MadeInPakistan from '@/components/MadeInPakistan';
 
 function friendlyError(message) {
   if (/invalid login credentials/i.test(message)) return 'Wrong username or password.';
@@ -58,22 +60,25 @@ export default function LoginPage() {
   return (
     <div className="login">
       <aside className="login-side">
+        <CrescentStar className="login-watermark" />
         <div className="brand">
-          <span className="brand-mark" style={{ background: 'var(--accent-ink)', color: 'var(--accent)' }}><Icon name="truck" size={20} /></span>
+          <span className="brand-mark login-brand-mark"><Icon name="truck" size={20} /></span>
           <span>{APP_NAME}</span>
         </div>
-        <div>
+        <div className="login-copy">
+          <PakistanFlag className="login-flag" />
           <h1>Every truck, every invoice, one log.</h1>
           <p>Record each consignment as it moves — vehicle, FBR digital invoice, both NTNs, goods value and sales tax — and review it by day, week or month.</p>
+          <ul className="login-fields" aria-label="Recorded for each consignment">
+            <li>Truck / vehicle number</li>
+            <li>Date and time</li>
+            <li>Sender and NTN</li>
+            <li>Receiver and NTN</li>
+            <li>FBR digital invoice no.</li>
+            <li>Goods value and sales tax</li>
+          </ul>
         </div>
-        <ul className="login-fields" aria-label="Recorded for each consignment">
-          <li>Truck / vehicle number</li>
-          <li>Date and time</li>
-          <li>Sender and NTN</li>
-          <li>Receiver and NTN</li>
-          <li>FBR digital invoice no.</li>
-          <li>Goods value and sales tax</li>
-        </ul>
+        <MadeInPakistan urdu className="made-in-hero" />
       </aside>
 
       <main className="login-main">

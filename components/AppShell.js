@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from './AuthProvider';
 import { APP_NAME } from '@/lib/config';
 import Icon from './Icon';
+import PakistanFlag from './PakistanFlag';
+import FlagBackdrop from './FlagBackdrop';
+import MadeInPakistan from './MadeInPakistan';
 
 export default function AppShell({ children }) {
   const { profile, isAdmin, signOut } = useAuth();
@@ -18,10 +21,12 @@ export default function AppShell({ children }) {
 
   return (
     <div className="shell">
+      <FlagBackdrop />
       <header className="topbar">
         <Link href={isAdmin ? '/admin' : '/records'} className="brand">
           <span className="brand-mark"><Icon name="truck" size={20} /></span>
           <span className="brand-name">{APP_NAME}</span>
+          <PakistanFlag className="flag-mini brand-flag" />
         </Link>
         <nav className="topnav" aria-label="Main">
           {links.map((l) => (
@@ -41,6 +46,9 @@ export default function AppShell({ children }) {
         </div>
       </header>
       <main className="page">{children}</main>
+      <footer className="shell-footer">
+        <MadeInPakistan />
+      </footer>
     </div>
   );
 }
